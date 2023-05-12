@@ -29,5 +29,6 @@ WORKSPACE_PATH=${3}
 
 OTHER_PATH=${4}
 
-nvidia-docker run -ti --net=host --ipc=host -v ${WORKSPACE_PATH}:/yuyan/workspace -v ${DATASET_PATH}:/yuyan/datasets -v ${OTHER_PATH}:/yuyan/other  --privileged $CONTAINER /bin/bash
+nvidia-docker run -ti --net=host --ipc=host -v ${WORKSPACE_PATH}:/yuyan/workspace -v ${DATASET_PATH}:/yuyan/datasets -v ${OTHER_PATH}:/yuyan/other --env HTTP_PROXY="http://172.18.216.39:7890" --env HTTPS_PROXY="http://172.18.216.39:7890" --env FTP_PROXY="http://172.18.216.39:7890" --env PYTHONPATH="/opt/prompt-tuning" --privileged $CONTAINER /bin/bash
+
 set +x

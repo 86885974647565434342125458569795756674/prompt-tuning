@@ -3,8 +3,8 @@
 #MODEL_DIR=${1:-${MODEL_DIR}}
 #TFDS_DATA_DIR=${2:-${TFDS_DATA_DIR}}
 
-MODEL_DIR="/t5x_home/workspace/model-dir/"
-TFDS_DATA_DIR="/t5x_home/datasets/"
+MODEL_DIR="/yuyan/workspace/model-dir/"
+TFDS_DATA_DIR="/yuyan/datasets/"
 
 if [ -z ${MODEL_DIR} ] || [ -z ${TFDS_DATA_DIR} ]; then
   echo "usage: ./sst2-demo.sh gs://your-bucket/path/to/model_dir gs://your-bucket/path/to/tfds/cache"
