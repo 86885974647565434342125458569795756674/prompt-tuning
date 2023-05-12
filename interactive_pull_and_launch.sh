@@ -17,7 +17,6 @@
 set -x
 
 CONTAINER=${1}
-echo $CONTAINER
 #docker pull $CONTAINER
 
 DATASET_PATH=${2} 
@@ -28,5 +27,7 @@ DATASET_PATH=${2}
 
 WORKSPACE_PATH=${3} 
 
-nvidia-docker run -ti --net=host --ipc=host -v ${PWD}:/t5x_home -v ${DATASET_PATH}:/t5x_home/datasets -v ${WORKSPACE_PATH:-${PWD}/workspace}:/t5x_home/workspace -v /home/yuyan/t5x/docs:/t5x_home/test --privileged $CONTAINER /bin/bash
+OTHER_PATH=${4}
+
+nvidia-docker run -ti --net=host --ipc=host -v ${WORKSPACE_PATH}:/yuyan/workspace -v ${DATASET_PATH}:/yuyan/datasets -v ${OTHER_PATH}:/yuyan/other  --privileged $CONTAINER /bin/bash
 set +x
