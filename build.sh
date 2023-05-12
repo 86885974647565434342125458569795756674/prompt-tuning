@@ -30,4 +30,4 @@ fi
 
 # building container here 
 #build 命令的 PATH 或 URL 指定的路径中的文件的集合。在镜像 build 过程中可以引用上下文中的任何文件，比如我们要介绍的 COPY 和 ADD 命令，就可以引用上下文中的文件。
-docker build -t $CONTAINER . -f Dockerfile
+docker build -t $CONTAINER . -f Dockerfile --build-arg HTTP_PROXY="http://172.18.216.39:7890" --build-arg HTTPS_PROXY="http://172.18.216.39:7890" --build-arg FTP_PROXY="http://172.18.216.39:7890"
