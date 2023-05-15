@@ -8,6 +8,8 @@
 # ginlint: disable=bad-import-order
 from __gin__ import dynamic_registration
 
+import prompt_tuning.data.glue
+
 import seqio
 from t5x import models
 from t5x import utils
