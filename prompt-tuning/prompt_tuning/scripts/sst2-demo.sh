@@ -19,11 +19,14 @@ echo "- ${T5X_DIR}"
 echo "- ${FLAXFORMER_DIR}"
 echo "- ${PROMPT_DIR}"
 echo "============================="
-PRETRAINED_MODEL="gs://t5-data/pretrained_models/t5x/t5_1_1_lm100k_base/checkpoint_1100000"
 
+#
+PRETRAINED_MODEL="gs://t5-data/pretrained_models/t5x/t5_1_1_lm100k_small/checkpoint_1100000"
+
+#
 python3 -m t5x.train \
   --gin_search_paths="${T5X_DIR},${FLAXFORMER_DIR},${PROMPT_DIR}" \
-  --gin_file="prompt_tuning/configs/models/t5_1_1_base_prompt.gin" \
+  --gin_file="prompt_tuning/configs/models/t5_1_1_small_prompt.gin" \
   --gin_file="prompt_tuning/configs/prompts/from_class_labels.gin" \
   --gin_file="prompt_tuning/configs/runs/prompt_finetune.gin" \
   --gin.CLASS_LABELS="['positive', 'negative']" \

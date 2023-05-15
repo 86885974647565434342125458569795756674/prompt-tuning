@@ -32,6 +32,4 @@ WORKDIR /opt/prompt-tuning
 COPY prompt-tuning .
 #RUN  python -m pip install --upgrade pip && pip install -e . 
 
-RUN pip install -e .
-
-RUN pip install -r pile_requirements.txt && pip install t5
+RUN pip install -e . && pip install -r pile_requirements.txt && pip install t5
