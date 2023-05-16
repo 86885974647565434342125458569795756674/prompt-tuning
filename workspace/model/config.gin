@@ -1,0 +1,436 @@
+from __gin__ import dynamic_registration
+import __main__ as train_script
+from flax import linen
+from flax import traverse_util
+from flaxformer.architectures.t5 import t5_architecture
+from flaxformer.components.attention import dense_attention
+from flaxformer.components import dense
+from flaxformer.components import embedding
+from flaxformer.components import layer_norm
+from flaxformer.components import relative_position_biases
+import prompt_tuning.data.glue
+from prompt_tuning import masks as prompt_masks
+from prompt_tuning import prompts
+from prompt_tuning.train import layers as prompt_layers
+from prompt_tuning.train import optim as pt_optim
+from prompt_tuning.train import partitioning as prompt_partitioning
+from prompt_tuning.train import prompts as train_prompts
+from prompt_tuning.train import utils as prompt_utils
+import seqio
+from t5x import adafactor
+from t5x import gin_utils
+from t5x import models
+from t5x import optimizers as optim
+from t5x import partitioning
+from t5x import trainer
+from t5x import utils
+
+# Macros:
+# ==============================================================================
+ACTIVATION_DTYPE = 'bfloat16'
+ACTIVATION_PARTITIONING_DIMS = 1
+ARCHITECTURE = @prompt_layers.PromptEncoderDecoder()
+BATCH_SIZE = 128
+BIAS_INIT = @bias_init/linen.initializers.normal()
+CLASS_LABELS = ['positive', 'negative']
+DROPOUT_FACTORY = @dropout_factory/linen.Dropout
+DROPOUT_RATE = 0.1
+EMBED_DIM = 512
+EVAL_PERIOD = 1000
+EVAL_STEPS = 20
+EVALUATOR_NUM_EXAMPLES = None
+EVALUATOR_USE_MEMORY_CACHE = True
+HEAD_DIM = 64
+INITIAL_CHECKPOINT_PATH = \
+    'gs://t5-data/pretrained_models/t5x/t5_1_1_lm100k_small/checkpoint_1100000'
+JSON_WRITE_N_RESULTS = None
+LABEL_SMOOTHING = 0.0
+LOSS_NORMALIZING_FACTOR = None
+MIXTURE_OR_TASK_MODULE = 'prompt_tuning.data.glue'
+MIXTURE_OR_TASK_NAME = 'taskless_glue_sst2_v200_examples'
+MLP_DIM = 1024
+MODEL = @models.EncoderDecoderModel()
+MODEL_DIR = '/home/c/prompt-tuning/workspace/model/'
+NUM_DECODER_LAYERS = 8
+NUM_EMBEDDINGS = 32128
+NUM_ENCODER_LAYERS = 8
+NUM_HEADS = 6
+OPTIMIZER = @optim.MultiOptimizer()
+PROMPT = @train_prompts.Prompt
+PROMPT_LENGTH = 100
+PROMPT_REGEX = ['.*/prompt/.*']
+RANDOM_SEED = None
+SCALE = 1.0
+TASK_FEATURE_LENGTHS = {'inputs': 512, 'targets': 8}
+TRAIN_STEPS = 1150000
+USE_CACHED_TASKS = False
+USE_HARDWARE_RNG = False
+VOCABULARY = @seqio.SentencePieceVocabulary()
+Z_LOSS = 0.0001
+
+# Parameters for adafactor.Adafactor:
+# ==============================================================================
+adafactor.Adafactor.decay_rate = 0.8
+adafactor.Adafactor.logical_factor_rules = \
+    @pt_optim.standard_logical_factor_rules()
+adafactor.Adafactor.multiply_by_parameter_scale = False
+adafactor.Adafactor.step_offset = 0
+adafactor.Adafactor.weight_decay_rate = 1e-05
+
+# Parameters for prompt_masks.add_fake_prompt:
+# ==============================================================================
+prompt_masks.add_fake_prompt.multitask = False
+prompt_masks.add_fake_prompt.prompt_length = %PROMPT_LENGTH
+
+# Parameters for utils.CheckpointConfig:
+# ==============================================================================
+utils.CheckpointConfig.restore = @utils.RestoreCheckpointConfig()
+utils.CheckpointConfig.save = @utils.SaveCheckpointConfig()
+
+# Parameters for prompt_utils.Checkpointer:
+# ==============================================================================
+prompt_utils.Checkpointer.save_paths = %PROMPT_REGEX
+
+# Parameters for utils.create_learning_rate_scheduler:
+# ==============================================================================
+utils.create_learning_rate_scheduler.base_learning_rate = 0.3
+utils.create_learning_rate_scheduler.factors = 'constant'
+utils.create_learning_rate_scheduler.warmup_steps = 1000
+
+# Parameters for prompt_masks.create_prompt_encoder_mask:
+# ==============================================================================
+prompt_masks.create_prompt_encoder_mask.prompt_length = %PROMPT_LENGTH
+
+# Parameters for infer_eval/utils.DatasetConfig:
+# ==============================================================================
+infer_eval/utils.DatasetConfig.batch_size = %BATCH_SIZE
+infer_eval/utils.DatasetConfig.mixture_or_task_name = %MIXTURE_OR_TASK_NAME
+infer_eval/utils.DatasetConfig.module = %MIXTURE_OR_TASK_MODULE
+infer_eval/utils.DatasetConfig.pack = False
+infer_eval/utils.DatasetConfig.seed = 42
+infer_eval/utils.DatasetConfig.shuffle = False
+infer_eval/utils.DatasetConfig.split = 'validation'
+infer_eval/utils.DatasetConfig.task_feature_lengths = None
+infer_eval/utils.DatasetConfig.use_cached = %USE_CACHED_TASKS
+
+# Parameters for train/utils.DatasetConfig:
+# ==============================================================================
+train/utils.DatasetConfig.batch_size = %BATCH_SIZE
+train/utils.DatasetConfig.mixture_or_task_name = %MIXTURE_OR_TASK_NAME
+train/utils.DatasetConfig.module = %MIXTURE_OR_TASK_MODULE
+train/utils.DatasetConfig.pack = False
+train/utils.DatasetConfig.seed = None
+train/utils.DatasetConfig.shuffle = True
+train/utils.DatasetConfig.split = 'train'
+train/utils.DatasetConfig.task_feature_lengths = %TASK_FEATURE_LENGTHS
+train/utils.DatasetConfig.use_cached = %USE_CACHED_TASKS
+
+# Parameters for train_eval/utils.DatasetConfig:
+# ==============================================================================
+train_eval/utils.DatasetConfig.batch_size = %BATCH_SIZE
+train_eval/utils.DatasetConfig.mixture_or_task_name = %MIXTURE_OR_TASK_NAME
+train_eval/utils.DatasetConfig.module = %MIXTURE_OR_TASK_MODULE
+train_eval/utils.DatasetConfig.pack = False
+train_eval/utils.DatasetConfig.seed = 42
+train_eval/utils.DatasetConfig.shuffle = False
+train_eval/utils.DatasetConfig.split = 'validation'
+train_eval/utils.DatasetConfig.task_feature_lengths = %TASK_FEATURE_LENGTHS
+train_eval/utils.DatasetConfig.use_cached = %USE_CACHED_TASKS
+
+# Parameters for t5_architecture.Decoder:
+# ==============================================================================
+t5_architecture.Decoder.dropout_factory = %DROPOUT_FACTORY
+t5_architecture.Decoder.dtype = %ACTIVATION_DTYPE
+t5_architecture.Decoder.layer_factory = @t5_architecture.DecoderLayer
+t5_architecture.Decoder.layer_norm_factory = @layer_norm.T5LayerNorm
+t5_architecture.Decoder.num_layers = %NUM_DECODER_LAYERS
+t5_architecture.Decoder.output_logits_factory = @output_logits/dense.DenseGeneral
+t5_architecture.Decoder.position_embedder_factory = None
+t5_architecture.Decoder.shared_relative_position_bias_factory = \
+    @relative_position_biases.RelativePositionBiases
+
+# Parameters for t5_architecture.DecoderLayer:
+# ==============================================================================
+t5_architecture.DecoderLayer.activation_partitioning_dims = \
+    %ACTIVATION_PARTITIONING_DIMS
+t5_architecture.DecoderLayer.dropout_factory = %DROPOUT_FACTORY
+t5_architecture.DecoderLayer.encoder_decoder_attention = \
+    @dense_attention.MultiHeadDotProductAttention()
+t5_architecture.DecoderLayer.layer_norm_factory = @layer_norm.T5LayerNorm
+t5_architecture.DecoderLayer.mlp = @dense.MlpBlock()
+t5_architecture.DecoderLayer.self_attention = \
+    @dense_attention.MultiHeadDotProductAttention()
+
+# Parameters for output_logits/dense.DenseGeneral:
+# ==============================================================================
+output_logits/dense.DenseGeneral.bias_init = %BIAS_INIT
+output_logits/dense.DenseGeneral.dtype = 'float32'
+output_logits/dense.DenseGeneral.features = %NUM_EMBEDDINGS
+output_logits/dense.DenseGeneral.kernel_axis_names = ['embed', 'vocab']
+output_logits/dense.DenseGeneral.kernel_init = \
+    @output_logits_kernel_init/linen.initializers.variance_scaling()
+output_logits/dense.DenseGeneral.use_bias = False
+
+# Parameters for dropout_factory/linen.Dropout:
+# ==============================================================================
+dropout_factory/linen.Dropout.broadcast_dims = (-2,)
+dropout_factory/linen.Dropout.rate = %DROPOUT_RATE
+
+# Parameters for embedding.Embed:
+# ==============================================================================
+embedding.Embed.attend_dtype = 'float32'
+embedding.Embed.cast_input_dtype = 'int32'
+embedding.Embed.dtype = %ACTIVATION_DTYPE
+embedding.Embed.embedding_init = @token_embedder_init/linen.initializers.normal()
+embedding.Embed.features = %EMBED_DIM
+embedding.Embed.name = 'token_embedder'
+embedding.Embed.num_embeddings = %NUM_EMBEDDINGS
+embedding.Embed.one_hot = True
+
+# Parameters for t5_architecture.Encoder:
+# ==============================================================================
+t5_architecture.Encoder.dtype = %ACTIVATION_DTYPE
+t5_architecture.Encoder.input_dropout_factory = %DROPOUT_FACTORY
+t5_architecture.Encoder.layer_factory = @t5_architecture.EncoderLayer
+t5_architecture.Encoder.layer_norm_factory = @layer_norm.T5LayerNorm
+t5_architecture.Encoder.num_layers = %NUM_ENCODER_LAYERS
+t5_architecture.Encoder.output_dropout_factory = %DROPOUT_FACTORY
+t5_architecture.Encoder.position_embedder_factory = None
+t5_architecture.Encoder.shared_relative_position_bias_factory = \
+    @relative_position_biases.RelativePositionBiases
+
+# Parameters for t5_architecture.EncoderDecoder:
+# ==============================================================================
+t5_architecture.EncoderDecoder.decoder_factory = @t5_architecture.Decoder
+t5_architecture.EncoderDecoder.dtype = %ACTIVATION_DTYPE
+t5_architecture.EncoderDecoder.encoder_factory = @t5_architecture.Encoder
+t5_architecture.EncoderDecoder.shared_token_embedder_factory = @embedding.Embed
+
+# Parameters for models.EncoderDecoderModel:
+# ==============================================================================
+models.EncoderDecoderModel.input_vocabulary = %VOCABULARY
+models.EncoderDecoderModel.label_smoothing = %LABEL_SMOOTHING
+models.EncoderDecoderModel.loss_normalizing_factor = %LOSS_NORMALIZING_FACTOR
+models.EncoderDecoderModel.module = %ARCHITECTURE
+models.EncoderDecoderModel.optimizer_def = %OPTIMIZER
+models.EncoderDecoderModel.output_vocabulary = %VOCABULARY
+models.EncoderDecoderModel.z_loss = %Z_LOSS
+
+# Parameters for t5_architecture.EncoderLayer:
+# ==============================================================================
+t5_architecture.EncoderLayer.activation_partitioning_dims = \
+    %ACTIVATION_PARTITIONING_DIMS
+t5_architecture.EncoderLayer.attention = \
+    @dense_attention.MultiHeadDotProductAttention()
+t5_architecture.EncoderLayer.dropout_factory = %DROPOUT_FACTORY
+t5_architecture.EncoderLayer.layer_norm_factory = @layer_norm.T5LayerNorm
+t5_architecture.EncoderLayer.mlp = @dense.MlpBlock()
+
+# Parameters for seqio.Evaluator:
+# ==============================================================================
+seqio.Evaluator.logger_cls = \
+    [@seqio.PyLoggingLogger, @seqio.TensorBoardLogger, @seqio.JSONLogger]
+seqio.Evaluator.num_examples = %EVALUATOR_NUM_EXAMPLES
+seqio.Evaluator.use_memory_cache = %EVALUATOR_USE_MEMORY_CACHE
+
+# Parameters for prompt_init/prompts.from_embedded_list:
+# ==============================================================================
+prompt_init/prompts.from_embedded_list.embeddings = @prompt_init/prompts.t5x_load()
+prompt_init/prompts.from_embedded_list.initializer = \
+    @prompt_init/prompts.from_sample_of_embeddings()
+prompt_init/prompts.from_embedded_list.texts = %CLASS_LABELS
+prompt_init/prompts.from_embedded_list.vocab = %VOCABULARY
+
+# Parameters for prompt_init/prompts.from_sample_of_embeddings:
+# ==============================================================================
+prompt_init/prompts.from_sample_of_embeddings.embeddings = \
+    @prompt_init/prompts.t5x_load()
+prompt_init/prompts.from_sample_of_embeddings.population_size = 5000
+
+# Parameters for seqio.JSONLogger:
+# ==============================================================================
+seqio.JSONLogger.write_n_results = %JSON_WRITE_N_RESULTS
+
+# Parameters for prompt_utils.match_any:
+# ==============================================================================
+prompt_utils.match_any.regexes = %PROMPT_REGEX
+
+# Parameters for dense.MlpBlock:
+# ==============================================================================
+dense.MlpBlock.activations = ('gelu', 'linear')
+dense.MlpBlock.bias_init = %BIAS_INIT
+dense.MlpBlock.dtype = %ACTIVATION_DTYPE
+dense.MlpBlock.final_dropout_rate = 0
+dense.MlpBlock.intermediate_dim = %MLP_DIM
+dense.MlpBlock.intermediate_dropout_rate = %DROPOUT_RATE
+dense.MlpBlock.kernel_init = @mlp_kernel_init/linen.initializers.variance_scaling()
+dense.MlpBlock.use_bias = False
+
+# Parameters for traverse_util.ModelParamTraversal:
+# ==============================================================================
+traverse_util.ModelParamTraversal.filter_fn = @prompt_utils.match_any()
+
+# Parameters for dense_attention.MultiHeadDotProductAttention:
+# ==============================================================================
+dense_attention.MultiHeadDotProductAttention.bias_init = %BIAS_INIT
+dense_attention.MultiHeadDotProductAttention.broadcast_dropout = True
+dense_attention.MultiHeadDotProductAttention.dropout_rate = %DROPOUT_RATE
+dense_attention.MultiHeadDotProductAttention.dtype = %ACTIVATION_DTYPE
+dense_attention.MultiHeadDotProductAttention.head_dim = %HEAD_DIM
+dense_attention.MultiHeadDotProductAttention.kernel_init = \
+    @attention_kernel_init/linen.initializers.variance_scaling()
+dense_attention.MultiHeadDotProductAttention.num_heads = %NUM_HEADS
+dense_attention.MultiHeadDotProductAttention.use_bias = False
+
+# Parameters for optim.MultiOptimizer:
+# ==============================================================================
+optim.MultiOptimizer.traversals_and_optimizers = \
+    ((@traverse_util.ModelParamTraversal(), @adafactor.Adafactor()),)
+
+# Parameters for bias_init/linen.initializers.normal:
+# ==============================================================================
+bias_init/linen.initializers.normal.stddev = 1e-06
+
+# Parameters for token_embedder_init/linen.initializers.normal:
+# ==============================================================================
+token_embedder_init/linen.initializers.normal.stddev = 1.0
+
+# Parameters for partitioning.PjitPartitioner:
+# ==============================================================================
+partitioning.PjitPartitioner.logical_axis_rules = \
+    @partitioning.standard_logical_axis_rules()
+partitioning.PjitPartitioner.model_parallel_submesh = None
+partitioning.PjitPartitioner.num_partitions = 1
+
+# Parameters for prompts.Prompt:
+# ==============================================================================
+prompts.Prompt.dtype = %ACTIVATION_DTYPE
+prompts.Prompt.length = %PROMPT_LENGTH
+prompts.Prompt.prompt_init = @prompt_init/prompts.from_embedded_list()
+
+# Parameters for train_prompts.Prompt:
+# ==============================================================================
+train_prompts.Prompt.prompt = @prompts.Prompt()
+
+# Parameters for prompt_layers.PromptEncoder:
+# ==============================================================================
+prompt_layers.PromptEncoder.add_fake_prompt_factory = @prompt_masks.add_fake_prompt
+prompt_layers.PromptEncoder.dtype = %ACTIVATION_DTYPE
+prompt_layers.PromptEncoder.input_dropout_factory = %DROPOUT_FACTORY
+prompt_layers.PromptEncoder.layer_factory = @t5_architecture.EncoderLayer
+prompt_layers.PromptEncoder.layer_norm_factory = @layer_norm.T5LayerNorm
+prompt_layers.PromptEncoder.num_layers = %NUM_ENCODER_LAYERS
+prompt_layers.PromptEncoder.output_dropout_factory = %DROPOUT_FACTORY
+prompt_layers.PromptEncoder.position_embedder_factory = None
+prompt_layers.PromptEncoder.prompt_factory = %PROMPT
+prompt_layers.PromptEncoder.shared_relative_position_bias_factory = \
+    @relative_position_biases.RelativePositionBiases
+
+# Parameters for prompt_layers.PromptEncoderDecoder:
+# ==============================================================================
+prompt_layers.PromptEncoderDecoder.add_fake_prompt_factory = \
+    @prompt_masks.add_fake_prompt
+prompt_layers.PromptEncoderDecoder.decoder_factory = @t5_architecture.Decoder
+prompt_layers.PromptEncoderDecoder.dtype = %ACTIVATION_DTYPE
+prompt_layers.PromptEncoderDecoder.encoder_factory = @prompt_layers.PromptEncoder
+prompt_layers.PromptEncoderDecoder.encoder_mask_factory = \
+    @prompt_masks.create_prompt_encoder_mask
+prompt_layers.PromptEncoderDecoder.shared_token_embedder_factory = @embedding.Embed
+
+# Parameters for relative_position_biases.RelativePositionBiases:
+# ==============================================================================
+relative_position_biases.RelativePositionBiases.dtype = %ACTIVATION_DTYPE
+relative_position_biases.RelativePositionBiases.embedding_init = \
+    @relative_position_bias_init/linen.initializers.variance_scaling()
+relative_position_biases.RelativePositionBiases.max_distance = 128
+relative_position_biases.RelativePositionBiases.num_buckets = 32
+relative_position_biases.RelativePositionBiases.num_heads = %NUM_HEADS
+
+# Parameters for utils.RestoreCheckpointConfig:
+# ==============================================================================
+utils.RestoreCheckpointConfig.assignment_map = (('^.*prompt.*$', None),)
+utils.RestoreCheckpointConfig.dtype = 'float32'
+utils.RestoreCheckpointConfig.fallback_to_scratch = True
+utils.RestoreCheckpointConfig.mode = 'specific'
+utils.RestoreCheckpointConfig.path = %INITIAL_CHECKPOINT_PATH
+
+# Parameters for utils.SaveCheckpointConfig:
+# ==============================================================================
+utils.SaveCheckpointConfig.checkpointer_cls = @prompt_utils.Checkpointer
+utils.SaveCheckpointConfig.dtype = 'float32'
+utils.SaveCheckpointConfig.keep = 1
+utils.SaveCheckpointConfig.period = 1000
+utils.SaveCheckpointConfig.save_dataset = False
+
+# Parameters for seqio.SentencePieceVocabulary:
+# ==============================================================================
+seqio.SentencePieceVocabulary.sentencepiece_model_file = \
+    'gs://t5-data/vocabs/cc_all.32000.100extra/sentencepiece.model'
+
+# Parameters for partitioning.standard_logical_axis_rules:
+# ==============================================================================
+partitioning.standard_logical_axis_rules.additional_rules = \
+    @prompt_partitioning.standard_logical_axis_rules()
+
+# Parameters for layer_norm.T5LayerNorm:
+# ==============================================================================
+layer_norm.T5LayerNorm.dtype = %ACTIVATION_DTYPE
+
+# Parameters for prompt_init/prompts.t5x_load:
+# ==============================================================================
+prompt_init/prompts.t5x_load.checkpoint_path = %INITIAL_CHECKPOINT_PATH
+prompt_init/prompts.t5x_load.variable_path = 'token_embedder/embedding'
+
+# Parameters for train_script.train:
+# ==============================================================================
+train_script.train.checkpoint_cfg = @utils.CheckpointConfig()
+train_script.train.eval_period = %EVAL_PERIOD
+train_script.train.eval_steps = %EVAL_STEPS
+train_script.train.infer_eval_dataset_cfg = @infer_eval/utils.DatasetConfig()
+train_script.train.inference_evaluator_cls = @seqio.Evaluator
+train_script.train.model = %MODEL
+train_script.train.model_dir = %MODEL_DIR
+train_script.train.partitioner = @partitioning.PjitPartitioner()
+train_script.train.random_seed = %RANDOM_SEED
+train_script.train.summarize_config_fn = @gin_utils.summarize_gin_config
+train_script.train.total_steps = %TRAIN_STEPS
+train_script.train.train_dataset_cfg = @train/utils.DatasetConfig()
+train_script.train.train_eval_dataset_cfg = @train_eval/utils.DatasetConfig()
+train_script.train.trainer_cls = @trainer.Trainer
+train_script.train.use_hardware_rng = %USE_HARDWARE_RNG
+
+# Parameters for trainer.Trainer:
+# ==============================================================================
+trainer.Trainer.learning_rate_fn = @utils.create_learning_rate_scheduler()
+trainer.Trainer.num_microbatches = None
+
+# Parameters for prompt_init/linen.initializers.uniform:
+# ==============================================================================
+prompt_init/linen.initializers.uniform.scale = 0.5
+
+# Parameters for attention_kernel_init/linen.initializers.variance_scaling:
+# ==============================================================================
+attention_kernel_init/linen.initializers.variance_scaling.distribution = 'normal'
+attention_kernel_init/linen.initializers.variance_scaling.mode = 'fan_in'
+attention_kernel_init/linen.initializers.variance_scaling.scale = %SCALE
+
+# Parameters for mlp_kernel_init/linen.initializers.variance_scaling:
+# ==============================================================================
+mlp_kernel_init/linen.initializers.variance_scaling.distribution = \
+    'truncated_normal'
+mlp_kernel_init/linen.initializers.variance_scaling.mode = 'fan_in'
+mlp_kernel_init/linen.initializers.variance_scaling.scale = %SCALE
+
+# Parameters for output_logits_kernel_init/linen.initializers.variance_scaling:
+# ==============================================================================
+output_logits_kernel_init/linen.initializers.variance_scaling.distribution = \
+    'truncated_normal'
+output_logits_kernel_init/linen.initializers.variance_scaling.mode = 'fan_in'
+output_logits_kernel_init/linen.initializers.variance_scaling.scale = %SCALE
+
+# Parameters for relative_position_bias_init/linen.initializers.variance_scaling:
+# ==============================================================================
+relative_position_bias_init/linen.initializers.variance_scaling.distribution = \
+    'uniform'
+relative_position_bias_init/linen.initializers.variance_scaling.mode = 'fan_avg'
+relative_position_bias_init/linen.initializers.variance_scaling.scale = %SCALE

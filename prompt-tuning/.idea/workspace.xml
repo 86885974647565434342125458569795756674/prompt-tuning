@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="57aaa81f-1594-40bd-a1b1-a7beacc7d009" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/prompt_tuning/configs/models/t5_1_1_prompt.gin" beforeDir="false" afterPath="$PROJECT_DIR$/prompt_tuning/configs/models/t5_1_1_prompt.gin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/prompt-tuning.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/prompt-tuning.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prompt_tuning/scripts/sst2-demo.sh" beforeDir="false" afterPath="$PROJECT_DIR$/prompt_tuning/scripts/sst2-demo.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,6 +32,49 @@
     &quot;git-widget-placeholder&quot;: &quot;main&quot;
   }
 }</component>
+  <component name="RunManager" selected="Python.train">
+    <configuration name="train" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="prompt-tuning" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/train.py" />
+      <option name="PARAMETERS" value="--gin_search_paths=$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/..,$PROJECT_DIR$/venv/lib/python3.8/site-packages/flaxformer/..,$PROJECT_DIR$/prompt_tuning/.. --gin_file=prompt_tuning/configs/models/t5_1_1_small_prompt.gin --gin_file=prompt_tuning/configs/prompts/from_class_labels.gin --gin_file=prompt_tuning/configs/runs/prompt_finetune.gin --gin.CLASS_LABELS=['positive', 'negative'] --gin.MODEL_DIR='$PROJECT_DIR$/../workspace/model/' --gin.MIXTURE_OR_TASK_NAME='taskless_glue_sst2_v200_examples' --gin.MIXTURE_OR_TASK_MODULE='prompt_tuning.data.glue' --gin.TASK_FEATURE_LENGTHS={'inputs': 512, 'targets': 8} --gin.INITIAL_CHECKPOINT_PATH='gs://t5-data/pretrained_models/t5x/t5_1_1_lm100k_small/checkpoint_1100000' --gin.TRAIN_STEPS=1_150_000 --gin.USE_CACHED_TASKS=False --tfds_data_dir=$PROJECT_DIR$/../workspace/data/" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="sst2-demo.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/prompt_tuning/scripts/sst2-demo.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/prompt_tuning/scripts" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/usr/bin/env" />
+      <option name="INTERPRETER_OPTIONS" value="bash" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Shell Script.sst2-demo.sh" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -41,5 +85,21 @@
       <updated>1684175676875</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/train.py</url>
+          <line>60</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/train.py</url>
+          <line>57</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

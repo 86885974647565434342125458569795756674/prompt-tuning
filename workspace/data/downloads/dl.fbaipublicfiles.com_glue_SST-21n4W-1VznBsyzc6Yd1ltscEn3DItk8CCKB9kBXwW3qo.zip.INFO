@@ -1,0 +1,1 @@
+{"dataset_names": ["glue"], "original_fname": "SST-2.zip", "url_info": {"checksum": "d67e16fb55739c1b32cdce9877596db1c127dc322d93c082281f64057c16deaa", "filename": "SST-2.zip", "size": 7439277}, "urls": ["https://dl.fbaipublicfiles.com/glue/data/SST-2.zip"]}
