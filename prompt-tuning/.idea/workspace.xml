@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="57aaa81f-1594-40bd-a1b1-a7beacc7d009" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/prompt-tuning.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/prompt-tuning.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prompt_tuning/scripts/sst2-demo.sh" beforeDir="false" afterPath="$PROJECT_DIR$/prompt_tuning/scripts/sst2-demo.sh" afterDir="false" />
     </list>
@@ -25,13 +24,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "settings.editor.selected.configurable": "terminal"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Python.train">
     <configuration name="train" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="prompt-tuning" />
@@ -45,11 +45,11 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/train.py" />
-      <option name="PARAMETERS" value="--gin_search_paths=$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/..,$PROJECT_DIR$/venv/lib/python3.8/site-packages/flaxformer/..,$PROJECT_DIR$/prompt_tuning/.. --gin_file=prompt_tuning/configs/models/t5_1_1_small_prompt.gin --gin_file=prompt_tuning/configs/prompts/from_class_labels.gin --gin_file=prompt_tuning/configs/runs/prompt_finetune.gin --gin.CLASS_LABELS=['positive', 'negative'] --gin.MODEL_DIR='$PROJECT_DIR$/../workspace/model/' --gin.MIXTURE_OR_TASK_NAME='taskless_glue_sst2_v200_examples' --gin.MIXTURE_OR_TASK_MODULE='prompt_tuning.data.glue' --gin.TASK_FEATURE_LENGTHS={'inputs': 512, 'targets': 8} --gin.INITIAL_CHECKPOINT_PATH='gs://t5-data/pretrained_models/t5x/t5_1_1_lm100k_small/checkpoint_1100000' --gin.TRAIN_STEPS=1_150_000 --gin.USE_CACHED_TASKS=False --tfds_data_dir=$PROJECT_DIR$/../workspace/data/" />
+      <option name="SCRIPT_NAME" value="t5x.train" />
+      <option name="PARAMETERS" value="--gin_search_paths=&quot;$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/..,$PROJECT_DIR$/venv/lib/python3.8/site-packages/flaxformer/..,$PROJECT_DIR$/prompt_tuning/..&quot; --gin_file=&quot;prompt_tuning/configs/models/t5_1_1_small_prompt.gin&quot; --gin_file=&quot;prompt_tuning/configs/prompts/from_class_labels.gin&quot; --gin_file=&quot;prompt_tuning/configs/runs/prompt_finetune.gin&quot; --gin.CLASS_LABELS=&quot;['positive', 'negative']&quot; --gin.MODEL_DIR=&quot;'$PROJECT_DIR$/../workspace/model/'&quot; --gin.MIXTURE_OR_TASK_NAME=&quot;'taskless_glue_sst2_v200_examples'&quot; --gin.MIXTURE_OR_TASK_MODULE=&quot;'prompt_tuning.data.glue'&quot; --gin.TASK_FEATURE_LENGTHS=&quot;{'inputs': 512, 'targets': 8}&quot; --gin.INITIAL_CHECKPOINT_PATH=&quot;'gs://t5-data/pretrained_models/t5x/t5_1_1_lm100k_small/checkpoint_1100000'&quot; --gin.TRAIN_STEPS=&quot;1_150_000&quot; --gin.USE_CACHED_TASKS=&quot;False&quot; --tfds_data_dir=$PROJECT_DIR$/../workspace/data/" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
+      <option name="MODULE_MODE" value="true" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
       <method v="2" />
@@ -91,13 +91,18 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/train.py</url>
-          <line>60</line>
-          <option name="timeStamp" value="4" />
+          <line>811</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/gin/config.py</url>
+          <line>2449</line>
+          <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/train.py</url>
-          <line>57</line>
-          <option name="timeStamp" value="5" />
+          <line>828</line>
+          <option name="timeStamp" value="17" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
