@@ -37,6 +37,8 @@ SCALE = 1.0
 DROPOUT_RATE = 0.0
 
 # Macros
+#Gin recognizes any value starting with '@' (even when nested inside a container) as a reference to another configurable function or class
+#Any configurable reference can be preceded by a scope name, separated from the configurable name by a / character.
 BIAS_INIT = @bias_init/linen.initializers.normal()
 bias_init/linen.initializers.normal.stddev = 1e-6
 DROPOUT_FACTORY = @dropout_factory/linen.Dropout

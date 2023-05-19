@@ -23,6 +23,8 @@ from prompt_tuning.train import prompts as train_prompts
 from prompt_tuning.train import utils as prompt_utils
 from prompt_tuning.train import optim as pt_optim
 
+# Gin allows you to indicate that certain parameters must be provided in a Gin config.
+# macro can be referenced using %
 ARCHITECTURE = %gin.REQUIRED
 
 include 'prompt_tuning/configs/architectures/prompt_encoder_t5_1_1_flaxformer.gin'
