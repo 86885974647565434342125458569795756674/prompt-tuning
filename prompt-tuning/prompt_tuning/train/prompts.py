@@ -176,7 +176,7 @@ class Prompt(nn.Module):
   """
   prompt: nn.Module
   combine: CombinationFn = prefix_prompt
-
+  # Traced<ShapedArray(int32[128,512])>with<DynamicJaxprTrace(level=1/0)>Traced<ShapedArray(bfloat16[128,512,512])>with<DynamicJaxprTrace(level=1/0)>
   def __call__(self, x, x_embed):
     prompt = self.prompt(x, x_embed)
     prompt = prompts.expand_to_batch(prompt, x_embed)

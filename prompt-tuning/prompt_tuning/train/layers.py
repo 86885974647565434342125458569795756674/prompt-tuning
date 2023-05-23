@@ -56,7 +56,7 @@ class PromptEncoder(t5_architecture.Encoder):
     """Returns the combined embedded inputs for further encoding."""
     assert inputs.ndim == 2  # (batch, len)
 
-    if 'position_ids' in self.embedder.embedders:
+    if 'position_ids' in self.embedder.embedders:# false
       if inputs_positions is None:
         seq_length = inputs.shape[-1]
         inputs_positions = jnp.arange(seq_length)[None, :]
