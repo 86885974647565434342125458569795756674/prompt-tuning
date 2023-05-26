@@ -98,7 +98,7 @@ class PromptEncoder(t5_architecture.Encoder):
     embedded_inputs = self.embed_and_combine_inputs(
         inputs,
         inputs_positions=inputs_positions,
-        enable_dropout=enable_dropout)
+        enable_dropout=enable_dropout)#false
     # BEGIN NEW
     logit_mask = jnp.expand_dims(
         jnp.array((self.add_fake_prompt(inputs) > 0),
@@ -322,7 +322,7 @@ class PromptEncoderDecoder(t5_architecture.EncoderDecoder):
     # the prompt.
     with_fake_prompt = self.add_fake_prompt(encoder_input_tokens)  # NEW
     # Make padding attention masks.
-    if decode:
+    if decode:#false
       # Fast autoregressive decoding uses only a special encoder-decoder mask.
       decoder_mask = None
       encoder_decoder_mask = dense_attention.make_attention_mask(
@@ -340,7 +340,7 @@ class PromptEncoderDecoder(t5_architecture.EncoderDecoder):
           dtype=self.dtype)
 
     # Add segmentation block-diagonal attention masks if using segmented data.
-    if encoder_segment_ids is not None:
+    if encoder_segment_ids is not None:#none
       if decode:
         raise ValueError(
             'During decoding, packing should not be used but '

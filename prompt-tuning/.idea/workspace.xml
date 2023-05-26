@@ -5,12 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="57aaa81f-1594-40bd-a1b1-a7beacc7d009" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/prompt-tuning.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/prompt-tuning.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prompt_tuning/configs/models/sizes/small.gin" beforeDir="false" afterPath="$PROJECT_DIR$/prompt_tuning/configs/models/sizes/small.gin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prompt_tuning/configs/runs/prompt_finetune.gin" beforeDir="false" afterPath="$PROJECT_DIR$/prompt_tuning/configs/runs/prompt_finetune.gin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/prompt_tuning/train/layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/prompt_tuning/train/layers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prompt_tuning/train/prompts.py" beforeDir="false" afterPath="$PROJECT_DIR$/prompt_tuning/train/prompts.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,19 +95,24 @@
           <option name="timeStamp" value="56" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/train.py</url>
-          <line>692</line>
-          <option name="timeStamp" value="57" />
+          <url>file://$PROJECT_DIR$/prompt_tuning/masks.py</url>
+          <line>121</line>
+          <option name="timeStamp" value="64" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/prompt_tuning/train/layers.py</url>
-          <line>107</line>
-          <option name="timeStamp" value="59" />
+          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/models.py</url>
+          <line>293</line>
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/flaxformer/architectures/t5/t5_architecture.py</url>
-          <line>774</line>
-          <option name="timeStamp" value="61" />
+          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/t5x/optimizers.py</url>
+          <line>543</line>
+          <option name="timeStamp" value="78" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/venv/lib/python3.8/site-packages/flaxformer/components/attention/dense_attention.py</url>
+          <line>2018</line>
+          <option name="timeStamp" value="79" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
