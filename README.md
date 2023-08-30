@@ -6,6 +6,32 @@ JAX的主要出发点就是将numpy的以上优势与硬件加速结合。一个
 
 有一个依附于jax的库，flax，专门为实现神经网络而生。
 
+# docker
+
+bash t5x/contrib/gpu/docker/build.sh t5x:230505
+
+bash t5x/contrib/gpu/docker/interactive_pull_and_launch.sh 489298/t5x:latest /data/yuyan/prompt-tuning/tfds_data_dir/ /data/yuyan/prompt-tuning/workspace/
+
+pip install t5
+
+python download_the_pile.py
+
+在tfds_piple.py加:
+
+from tensorflow_datasets.core.utils import gcs_utils                                               
+gcs_utils._is_gcs_disabled = True  
+
+在download_the_pile.py修改:
+
+ds=tfds.load('ThePile',try_gcs=False) 
+
+mkdir /workspace/model-dir
+
+MODEL_DIR="/t5x_home/workspace/model-dir/"
+TFDS_DATA_DIR="/t5x_home/datasets/"
+
+gs://t5-data/pretrained_models/t5x/t5_1_1_lm100k_small/checkpoint_1100000
+
 # linux pycharm
 
 git config --global http.proxy http://172.18.216.39:7890                             
